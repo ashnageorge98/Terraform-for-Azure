@@ -1,4 +1,5 @@
 #Azure Active Directory (AAD) is the directory service that stores information about users, groups, and applications.
+Creates users, groups, and applications in Azure Active Directory.
 
 # Provider Block: This tells Terraform to use the Azure AD plugin
 
