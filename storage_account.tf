@@ -2,11 +2,23 @@ provider "azurerm" {
   features {}
 }
 
+# Create a storage account
 resource "azurerm_storage_account" "example" {
-  name                     = "mystorageaccount"              # Name of the storage account (must be globally unique)
-  resource_group_name       = "myresourcegroup"              # Name of the resource group where this storage account will be created
-  location                  = "East US"                      # Azure region where the storage account is located
-  account_tier              = "Standard"                     # Pricing tier (Standard or Premium)
-  account_replication_type  = "LRS"                          # Replication type: Local Redundant Storage (LRS)
+  name                     = "examplestoracc123"  # Storage account name must be unique globally
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"  # Locally-redundant storage
+
+  tags = {
+    environment = "Dev"
+    project     = "Storage"
+  }
 }
 
+# Create a storage container in the storage account
+resource "azurerm_storage_container" "example" {
+  name                  = "content"
+  storage_account_name  = azurerm_storage_account.example.name
+  container_access_type = "private"
+}
