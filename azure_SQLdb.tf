@@ -13,7 +13,7 @@ resource "azurerm_sql_server" "example" {
   location                     = azurerm_resource_group.example.location
   version                      = "12.0"
   administrator_login          = "sqladmin"
-  administrator_login_password = "P@ssw0rd1234!"  # Use a secure password in real applications
+  administrator_login_password = "P@ssw0rd1234!"                        # Use a secure password in real applications
 
   tags = {
     environment = "testing"
