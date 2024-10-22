@@ -7,6 +7,10 @@ resource "azurerm_managed_disk" "example" {
   create_option        = "Empty"                               # Option to create an empty disk (others: "FromImage", "Import")
   disk_size_gb         = 128                                   # Size of the disk in GB
 }
+  # Optional: Tags
+  tags = {
+    environment = "testing"
+  }
 
 #Unmanaged disk
 resource "azurerm_managed_disk" "example" {
