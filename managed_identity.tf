@@ -1,5 +1,5 @@
 #Managed Identities are special identities in Azure used to give resources like VMs, containers, 
-or other Azure services access to Azure resources without needing to store credentials.
+or other Azure services access to Azure resources without needing to store credentials/secrets.
 
 # Resource Block: Creates a user-assigned managed identity
 resource "azurerm_user_assigned_identity" "example" {
