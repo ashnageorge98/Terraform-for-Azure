@@ -1,3 +1,5 @@
+#A Service Principal allows applications or automation tools to access Azure resources.
+
 # Resource Block: Creates an Azure AD service principal from an application
 resource "azuread_service_principal" "example" {
   application_id = azuread_application.example.application_id           # Links the service principal to the application
