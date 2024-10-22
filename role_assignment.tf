@@ -1,3 +1,5 @@
+#Role assignment links users or applications to specific roles in Azure, which grants them certain permissions.
+
 # Provider Block: Uses the Azure RM (Resource Manager) plugin
 provider "azurerm" {
   features {}
