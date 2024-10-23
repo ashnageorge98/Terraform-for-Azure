@@ -1,3 +1,5 @@
+# The Azure Key Vault is used to store sensitive information like passwords, certificates, or secrets.
+
 # Provider Configuration
 provider "azurerm" {
   features {}
@@ -12,8 +14,8 @@ resource "azurerm_resource_group" "rg" {
 # Create Azure Key Vault
 resource "azurerm_key_vault" "kv" {
   name                        = "examplekeyvault"
-  location                    = azurerm_resource_group.rg.location
-  resource_group_name         = azurerm_resource_group.rg.name
+  location                    = "EastUS"
+  resource_group_name         = "RG1"
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
 
