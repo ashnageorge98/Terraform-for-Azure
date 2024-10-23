@@ -32,6 +32,10 @@ resource "azurerm_container_app" "app" {
       cpu    = "0.25"
       memory = "0.5Gi"
     }
+ingress {
+      external_enabled = true
+      target_port      = 80
+    }
   }
 }
 
