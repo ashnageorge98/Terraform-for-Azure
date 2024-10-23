@@ -1,0 +1,11 @@
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_log_analytics_workspace" "example" {
+  name                = "example-log-analytics-workspace"
+  resource_group_name =  "RG1"
+  location            =  "EastUS"
+  sku                 =  "PerGB2018"                    # Pricing tier for the workspace
+  retention_in_days   =  30                             # How long to keep the logs
+}
