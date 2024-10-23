@@ -1,3 +1,5 @@
+# This is where logs from different resources are collected and analyzed.
+
 provider "azurerm" {
   features {}
 }
