@@ -7,20 +7,72 @@ pool:
 variables:
   TF_VAR_resource_group_name: 'myResourceGroup'
   TF_VAR_location: 'East US'
+  TF_VAR_sql_admin_password: '$(sqlAdminPassword)'  # stored as a pipeline secret
 
-steps:
-- task: UseTerraform@0
-  inputs:
-    command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+stages:
+- stage: Terraform_Deploy
+  jobs:
+  - job: Terraform_Init_Plan
+    steps:
+    - task: UseTerraform@0
+      inputs:
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
 
-- task: UseTerraform@0
-  inputs:
-    command: 'plan'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+    - task: UseTerraform@0
+      inputs:
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+        args: '-out=tfplan'
 
-- task: UseTerraform@0
-  inputs:
-    command: 'apply'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-    args: '-auto-approve'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: tfplan
+        targetPath: $(System.DefaultWorkingDirectory)
+
+  - job: Terraform_Apply
+    dependsOn: Terraform_Init_Plan
+    steps:
+    - task: UseTerraform@0
+      inputs:
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+        args: '-auto-approve tfplan'
+
+    - task: PowerShell@2
+      inputs:
+        script: |
+          Write-Host "Running tests on the deployed environment"
+          # Example integration or infrastructure tests here
+
+  - job: Terraform_Approval
+    dependsOn: Terraform_Apply
+    steps:
+    - task: ManualValidation@0
+      inputs:
+        instructions: 'Please approve the deployment to production.'
+
+- stage: Terraform_Deploy_Prod
+  dependsOn: Terraform_Deploy
+  condition: succeeded('Terraform_Approval')
+  jobs:
+  - job: Terraform_Init_Plan_Prod
+    steps:
+    - task: UseTerraform@0
+      inputs:
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/prod'
+
+    - task: UseTerraform@0
+      inputs:
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/prod'
+
+  - job: Terraform_Apply_Prod
+    dependsOn: Terraform_Init_Plan_Prod
+    steps:
+    - task: UseTerraform@0
+      inputs:
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/prod'
+        args: '-auto-approve'
