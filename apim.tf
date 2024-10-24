@@ -1,4 +1,4 @@
-# secure and manage api im dev before moving to qa or prod.
+# apim instances will secure and manage api in dev before promoting to qa and prod.
 Real-World DevOps Use Case:
 In a DevOps pipeline, the APIM instance and its APIs are deployed in a development environment (using the Developer SKU for cost-saving).
 DevOps engineers manage this through Terraform, automating API deployment, updates, and lifecycle management (such as scaling or applying security policies).
