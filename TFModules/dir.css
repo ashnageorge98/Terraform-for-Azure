@@ -1,0 +1,25 @@
+my-terraform-project/
+ modules/
+    vnet/
+       main.tf
+       outputs.tf
+       variables.tf
+    subnet/
+       main.tf
+       outputs.tf
+       variables.tf
+    vm/
+       main.tf
+       outputs.tf
+       variables.tf
+ env/
+    dev/
+       main.tf
+       variables.tf
+    prod/
+       main.tf
+       variables.tf
+ backend.tf
+ provider.tf
+ terraform.tfvars
+
