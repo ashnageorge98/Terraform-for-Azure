@@ -8,7 +8,7 @@ Security policies, including OAuth, rate-limiting, and logging, can be added to 
 # Step 1: Define the provider
 provider "azurerm" {
   features {}
-  alias = "apim"
+  alias           = "apim"
   subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
@@ -19,7 +19,48 @@ resource "azurerm_resource_group" "rg" {
   location = "East US"
 }
 
-# Step 3: Define an API Management Service
+# Step 3: Define a Virtual Network for APIM
+resource "azurerm_virtual_network" "vnet" {
+  name                = "apim-vnet"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+# Step 4: Define a Subnet for APIM
+resource "azurerm_subnet" "subnet" {
+  name                 = "apim-subnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Step 5: Define a Network Security Group for APIM subnet
+resource "azurerm_network_security_group" "apim_nsg" {
+  name                = "apim-nsg"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "AllowHttpsInBound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_ranges    = ["443"]
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# Step 6: Associate the Network Security Group with the Subnet
+resource "azurerm_subnet_network_security_group_association" "subnet_nsg_association" {
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = azurerm_network_security_group.apim_nsg.id
+}
+
+# Step 7: Define an API Management Service
 resource "azurerm_api_management" "apim" {
   name                = "devops-apim-service"
   location            = azurerm_resource_group.rg.location
@@ -27,7 +68,11 @@ resource "azurerm_api_management" "apim" {
   publisher_name      = "Ashna DevOps"
   publisher_email     = "ashnageorge98@gmail.com"
 
-  virtual_network_type = "Internal" # internal if using private, vnet or external
+  virtual_network_type = "Internal" # Set to Internal for private access
+
+  virtual_network_configuration {
+    subnet_id = azurerm_subnet.subnet.id  # Reference the subnet
+  }
 
   sku_name            = "Developer_1"  # Dev environment - cheaper SKU
 
@@ -41,20 +86,7 @@ resource "azurerm_api_management" "apim" {
   }
 }
 
-# Step 4: Define a Virtual Network for APIM (optional but recommended in real-world)
-resource "azurerm_virtual_network" "vnet" {
-  name                = "apim-vnet"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  address_space       = ["10.0.0.0/16"]
-}
-
-resource "azurerm_subnet" "subnet" {
-  name                 = "apim-subnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
-}# Step 5: Define a Sample API within the APIM instance
+# Step 8: Define a Sample API within the APIM instance
 resource "azurerm_api_management_api" "sample_api" {
   name                = "sample-api"
   resource_group_name = azurerm_resource_group.rg.name
@@ -65,7 +97,7 @@ resource "azurerm_api_management_api" "sample_api" {
   protocols           = ["https"]
 }
 
-# Step 6: Define an API Operation
+# Step 9: Define an API Operation
 resource "azurerm_api_management_api_operation" "get_operation" {
   operation_id        = "getSampleData"
   api_name            = azurerm_api_management_api.sample_api.name
@@ -74,7 +106,7 @@ resource "azurerm_api_management_api_operation" "get_operation" {
   display_name        = "Get Sample Data"
   method              = "GET"
   url_template        = "/data"
-
+  
   response {
     status_code  = 200
 
