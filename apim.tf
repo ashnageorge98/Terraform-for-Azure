@@ -5,14 +5,16 @@ DevOps engineers manage this through Terraform, automating API deployment, updat
 APIs undergo versioning and testing in a Dev environment before promotion to QA and Production.
 Security policies, including OAuth, rate-limiting, and logging, can be added to the APIM instance after deployment.
 
-
 # Step 1: Define the provider
 provider "azurerm" {
   features {}
+  alias = "apim"
+  subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
 # Step 2: Define Resource Group
 resource "azurerm_resource_group" "rg" {
+  provider = azurerm.apim
   name     = "rg-apim-devops"
   location = "East US"
 }
@@ -22,12 +24,17 @@ resource "azurerm_api_management" "apim" {
   name                = "devops-apim-service"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  publisher_name      = "DevOps Team"
-  publisher_email     = "devops@example.com"
+  publisher_name      = "Ashna DevOps"
+  publisher_email     = "ashnageorge98@gmail.com"
+
+  virtual_network_type = "Internal" # internal if using private, vnet or external
+
   sku_name            = "Developer_1"  # Dev environment - cheaper SKU
+
   identity {
     type = "SystemAssigned"
   }
+
   tags = {
     environment = "dev"
     department  = "DevOps"
@@ -47,21 +54,14 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
-}
-
-resource "azurerm_api_management_virtual_network_configuration" "vnet_config" {
-  api_management_id = azurerm_api_management.apim.id
-  subnet_id         = azurerm_subnet.subnet.id
-}
-
-# Step 5: Define a Sample API within the APIM instance
+}# Step 5: Define a Sample API within the APIM instance
 resource "azurerm_api_management_api" "sample_api" {
   name                = "sample-api"
   resource_group_name = azurerm_resource_group.rg.name
   api_management_name = azurerm_api_management.apim.name
-  revision            = "1"
   display_name        = "Sample API"
   path                = "sample"
+  revision            = "1"
   protocols           = ["https"]
 }
 
@@ -74,10 +74,11 @@ resource "azurerm_api_management_api_operation" "get_operation" {
   display_name        = "Get Sample Data"
   method              = "GET"
   url_template        = "/data"
+
   response {
-    status  = 200
-    description = "Success"
-    representations {
+    status_code  = 200
+
+    representation {
       content_type = "application/json"
     }
   }
