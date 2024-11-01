@@ -1,3 +1,9 @@
+# Configure the Azure provider
+provider "azurerm" {
+  features {}
+  subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
+}
+
 # Create a resource group
 resource "azurerm_resource_group" "example" {
   name     = "rg-container-apps"
@@ -42,4 +48,4 @@ resource "azurerm_container_app" "example" {
       }
     }
   }
-}
+}                                                      
