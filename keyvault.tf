@@ -1,4 +1,5 @@
 # Securely storing secrets such as API keys, connection strings, certificates, etc
+# The Azure Key Vault is used to store sensitive information like passwords, certificates, or secrets.
 
 provider "azurerm" {
   features {}
