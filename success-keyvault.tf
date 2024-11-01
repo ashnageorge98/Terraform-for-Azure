@@ -2,6 +2,12 @@
 # The Azure Key Vault is used to store sensitive information like passwords, certificates, or secrets.
 
 --
+# create terraform.tfvars first
+resource_group_name = "RG1"
+location            = "East US"
+key_vault_name      = "keyvaultash1029"
+
+#keyvault.tf/main.tf -
 # Configure the Azure provider
 provider "azurerm" {
   features {}
