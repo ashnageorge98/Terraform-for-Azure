@@ -1,32 +1,31 @@
 provider "azurerm" {
   features {}
-subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
-# Variables for existing resources
+# Variables
 variable "resource_group_name" {
-  default = "myResourceGroup"
+  default = "myNewResourceGroup"  # Change this if desired
 }
 
 variable "location" {
-  default = "eastus" # Change to your desired location
+  default = "eastus"  # Change to your preferred Azure region
 }
 
 variable "vnet_name" {
-  default = "myVNet"
+  default = "myNewVNet"  # Change to your desired VNet name
 }
 
 variable "vnet_address_space" {
-  default = ["10.0.0.0/16"] # Adjust as needed
+  default = ["10.0.0.0/16"]  # Adjust as needed
 }
 
-# Define the resource group
+# Create Resource Group
 resource "azurerm_resource_group" "example_rg" {
   name     = var.resource_group_name
   location = var.location
 }
 
-# Define the virtual network
+# Create Virtual Network
 resource "azurerm_virtual_network" "example_vnet" {
   name                = var.vnet_name
   resource_group_name = azurerm_resource_group.example_rg.name
@@ -34,24 +33,27 @@ resource "azurerm_virtual_network" "example_vnet" {
   address_space       = var.vnet_address_space
 }
 
-# Define subnets
+# Create Subnets
 resource "azurerm_subnet" "example_subnet1" {
   name                 = "subnet1"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.0.1.0/24"]  # Adjust as needed
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+  depends_on           = [azurerm_virtual_network.example_vnet]  # Ensures VNet creation is completed first
 }
 
 resource "azurerm_subnet" "example_subnet2" {
   name                 = "subnet2"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.0.2.0/24"]  # Adjust as needed
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.2.0/24"]
+  depends_on           = [azurerm_virtual_network.example_vnet]  # Ensures VNet creation is completed first
 }
 
 resource "azurerm_subnet" "example_subnet3" {
   name                 = "subnet3"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = var.vnet_name
-  address_prefixes     = ["10.0.3.0/24"]  # Adjust as needed
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.3.0/24"]
+  depends_on           = [azurerm_virtual_network.example_vnet]  # Ensures VNet creation is completed first
 }
