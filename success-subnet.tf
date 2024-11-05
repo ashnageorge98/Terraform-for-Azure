@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
 # Variables
