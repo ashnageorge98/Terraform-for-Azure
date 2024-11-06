@@ -1,25 +1,26 @@
 provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
+  features {}
   subscription_id = "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
-# Create a resource group
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "East US"
+# Define the existing resource group name
+variable "resource_group_name" {
+  default = "RG1"  # Set to the name of your existing Resource Group
+}
+
+# Fetch the existing resource group details
+data "azurerm_resource_group" "existing" {
+  name = var.resource_group_name
 }
 
 # Create a virtual network (VNet)
 resource "azurerm_virtual_network" "example" {
   name                = "example-vnet"
   address_space       = ["10.0.0.0/16"]  # Define the VNet address space
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = data.azurerm_resource_group.existing.location
+  resource_group_name = data.azurerm_resource_group.existing.name
 }
+
 
 # Define CIDR ranges for each subnet
 locals {
@@ -36,7 +37,7 @@ locals {
 resource "azurerm_subnet" "example" {
   count                 = length(local.subnets)
   name                  = local.subnets[count.index].name
-  resource_group_name   = azurerm_resource_group.example.name
+  resource_group_name   = data.azurerm_resource_group.existing.name
   virtual_network_name  = azurerm_virtual_network.example.name
   address_prefixes      = [local.subnets[count.index].cidr]
 }
