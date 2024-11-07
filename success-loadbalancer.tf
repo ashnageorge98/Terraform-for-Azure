@@ -113,6 +113,8 @@ resource "azurerm_linux_virtual_machine" "example_vm" {
     public_key = file("~/.ssh/id_rsa.pub")  # Path to your SSH public key file
   }
 
+# if not using ssh key, then enter disable_password_authentication = false and delete admin_ssh_key block and run terraform validate
+
   network_interface_ids = [azurerm_network_interface.example_nic[count.index].id]
 
   os_disk {
