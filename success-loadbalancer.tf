@@ -105,7 +105,14 @@ resource "azurerm_linux_virtual_machine" "example_vm" {
   resource_group_name = "RG1"
   size                = "Standard_DS1_v2"
   admin_username      = "azureuser"
-  admin_password      = "P@ssw0rd1234!"
+  disable_password_authentication = true
+
+  # Add SSH key for authentication
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")  # Path to your SSH public key file
+  }
+
   network_interface_ids = [azurerm_network_interface.example_nic[count.index].id]
 
   os_disk {
