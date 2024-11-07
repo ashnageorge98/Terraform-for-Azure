@@ -120,3 +120,12 @@ resource "azurerm_linux_virtual_machine" "example_vm" {
     version   = "latest"
   }
 }
+
+Notes:
+backend_port = 80 (http)- http traffic coming to port 80 on frontend vm will be forwarded to backend vm in port 80 by the load balancer
+
+backend_port = 22(ssh):
+this is to ssh into vm usig port 22. here load balancer will forward traffic coming to vm in port 22 to backend vm in port 22. 
+this is for admin activities for external users to login.
+When SSH traffic arrives at the load balancer on port 22, it is forwarded to port 22 on the backend VMs. 
+This allows you to SSH into your VMs for administrative tasks.
