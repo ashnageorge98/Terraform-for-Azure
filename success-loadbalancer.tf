@@ -101,9 +101,6 @@ resource "azurerm_network_interface" "example_nic" {
     private_ip_address_allocation = "Dynamic"
 
     # Correctly assigning the NIC to the backend address pool
-    load_balancer_backend_address_pool_ids = [
-      azurerm_lb_backend_address_pool.example_bap.id
-    ]
   }
 }
 
@@ -130,12 +127,6 @@ resource "azurerm_linux_virtual_machine" "example_vm" {
     version   = "latest"
   }
 }
-
-
-
-
-
-
 
 #Notes:
 Load Balancing Rule (Port 80): Distributes HTTP (web) traffic across multiple backend instances.
