@@ -5,16 +5,20 @@ subscription_id   =    "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
 # Resource group for SQL Server and Database
-resource "azurerm_resource_group" "example" {
-  name     = "example-resource-group"
-  location = "West Europe"
+variable "resource_group_name" {
+  default = "RG1"
+}
+
+# Data source to reference the existing resource group
+data "azurerm_resource_group" "example" {
+  name = var.resource_group_name
 }
 
 # Azure SQL Server
 resource "azurerm_mssql_server" "example" {
   name                         = "example-mssql-server"
-  resource_group_name          = azurerm_resource_group.example.name
-  location                     = azurerm_resource_group.example.location
+  resource_group_name          = data.azurerm_resource_group.example.name
+  location                     = data.azurerm_resource_group.example.location  # Reference the location dynamically
   version                      = "12.0"                            # SQL Server version
   administrator_login          = "sqladminuser"                    # Admin username
   administrator_login_password = "P@ssw0rd123!"                    # Admin password, consider using secrets
@@ -45,10 +49,11 @@ resource "azurerm_mssql_firewall_rule" "allow_specific_ip_range" {
   end_ip_address      = "192.168.1.255"
 }
 
+
 # Azure SQL Database inside the SQL Server
 resource "azurerm_mssql_database" "example" {
-  server_id           = azurerm_mssql_server.example.id               
   name                = "example-mssql-database"
+  server_id           = azurerm_mssql_server.example.id
   collation           = "SQL_Latin1_General_CP1_CI_AS"             # Database collation
   max_size_gb         = 1
   sku_name            = "S0"
@@ -66,7 +71,7 @@ resource "azurerm_mssql_database" "example" {
 
 # resource "azurerm_sql_active_directory_administrator" "example" {
 #   server_name         = azurerm_mssql_server.example.name
-#   resource_group_name = azurerm_resource_group.example.name
+#   resource_group_name = data.azurerm_resource_group.example.name  # Reference the same RG
 #   login               = "aad-admin-user"
 #   object_id           = "aad-user-object-id"    # Replace with actual AD user or group object ID
 #   tenant_id           = "aad-tenant-id"         # Replace with actual tenant ID
@@ -81,7 +86,7 @@ resource "azurerm_mssql_database" "example" {
 #   collation  = azurerm_mssql_database.example.collation
 #   sku_name   = azurerm_mssql_database.example.sku_name
 #   create_mode = "Secondary"                      # Specify as a replica database
-#   location   = "East US"                         # Location for secondary region
+#   location   = data.azurerm_resource_group.example.location  # Use the location dynamically                         # Location for secondary region
 
 #   tags = {
 #     environment = "Development"
