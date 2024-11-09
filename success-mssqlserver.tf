@@ -1,10 +1,6 @@
 # Configure the Azure provider
 provider "azurerm" {
-  features {
-resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
+  features {}
 subscription_id   =    "81b0b41e-5edd-4af2-86ea-1b1457a4374c"
 }
 
