@@ -46,7 +46,7 @@ resource "azurerm_storage_account" "example" {
 # Define Blob Container
 resource "azurerm_storage_container" "example" {
   name                  = "example-container"
-  storage_account_name  = azurerm_storage_account.example.name
+  storage_account_id    = azurerm_storage_account.example.id
   container_access_type = "private" # Options: private, blob, container
 }
 
@@ -90,6 +90,7 @@ resource_types {
 # Optional: Shared Access Signature URL output for convenience
 output "sas_url" {
   value = "${azurerm_storage_account.example.primary_blob_endpoint}${azurerm_storage_container.example.name}?${data.azurerm_storage_account_sas.example.sas}"
+  sensitive = true
 }
 
 # Optional: Outputs for debugging or further use
