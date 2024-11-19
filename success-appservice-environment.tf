@@ -16,7 +16,7 @@ provider "azurerm" {
 variable "location" { default = "East US" }
 variable "vnet_name" { default = "ase-vnet" }
 variable "subnet_name" { default = "ase-subnet" }
-variable "ase_name" { default = "my-ase" }
+variable "ase_name" { default = "my-aseunique12" }
 variable "app_service_plan_name" { default = "my-app-service-plan" }
 
 # Reference existing resource group
@@ -120,6 +120,7 @@ resource "azurerm_application_gateway" "main" {
     http_listener_name         = "example-http-listener"
     backend_address_pool_name  = "example-backend-pool"
     backend_http_settings_name = "example-backend-http-settings"
+    priority                   = 100
   }
 }
 
