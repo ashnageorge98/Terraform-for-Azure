@@ -15,8 +15,8 @@ provider "azurerm" {
 # Define variables
 variable "location" { default = "East US" }
 variable "vnet_name" { default = "ase-vnet" }
-variable "subnet_name" { default = "ase-subnet" }
-variable "ase_name" { default = "my-aseunique12" }
+variable "subnet_name" { default = "ase-new-subnet" }
+variable "ase_name" { default = "my-aseash12" }
 variable "app_service_plan_name" { default = "my-app-service-plan" }
 
 # Reference existing resource group
@@ -33,19 +33,30 @@ resource "azurerm_virtual_network" "main" {
 }
 
 # Subnet
-resource "azurerm_subnet" "ase_subnet" {
+resource "azurerm_subnet" "ase-new-subnet" {
   name                 = var.subnet_name
   resource_group_name  = data.azurerm_resource_group.existing.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
   service_endpoints    = ["Microsoft.Web"]
+
+delegation {
+    name = "delegation"
+    service_delegation {
+      name = "Microsoft.Web/hostingEnvironments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action",
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
+    }
+  }
 }
 
 # App Service Environment
 resource "azurerm_app_service_environment_v3" "main" {
   name                = var.ase_name
   resource_group_name = data.azurerm_resource_group.existing.name
-  subnet_id           = azurerm_subnet.ase_subnet.id
+  subnet_id           = azurerm_subnet.ase-new-subnet.id
   zone_redundant      = false
 }
 
@@ -82,7 +93,7 @@ resource "azurerm_application_gateway" "main" {
 
   gateway_ip_configuration {
     name      = "example-gateway-ip-config"
-    subnet_id = azurerm_subnet.ase_subnet.id
+    subnet_id = azurerm_subnet.ase-new-subnet.id
   }
 
   frontend_ip_configuration {
